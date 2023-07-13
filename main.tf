@@ -40,7 +40,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     avm_git_last_modified_at = "2023-06-05 02:21:33"
     avm_git_org              = "jchi4"
     avm_git_repo             = "Adv11"
-    avm_yor_trace            = "3def8125-477c-4793-a675-7efd5f208f86"
+    avm_yor_trace            = "08b0c050-6ca0-428f-a259-5700ebd678bd"
     } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/), (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
     avm_yor_name = "main"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
@@ -551,7 +551,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
     avm_git_last_modified_at = "2023-05-04 05:02:32"
     avm_git_org              = "jchi4"
     avm_git_repo             = "Adv11"
-    avm_yor_trace            = "6b11e49e-435d-4d09-8e94-bef78b9792ac"
+    avm_yor_trace            = "ee238cfe-67fb-4cfe-b0bb-699af91f58c0"
     } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/), (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
     avm_yor_name = "node_pool"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
@@ -695,7 +695,7 @@ resource "azurerm_log_analytics_workspace" "main" {
     avm_git_last_modified_at = "2023-06-05 02:21:33"
     avm_git_org              = "jchi4"
     avm_git_repo             = "Adv11"
-    avm_yor_trace            = "54aae20d-ebae-4ca7-b0e7-c1086e69f127"
+    avm_yor_trace            = "dfdd74a1-f670-4039-9d6f-3b1c57a82fc8"
     } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/), (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
     avm_yor_name = "main"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
@@ -735,7 +735,7 @@ resource "azurerm_log_analytics_solution" "main" {
     avm_git_last_modified_at = "2023-06-01 03:13:59"
     avm_git_org              = "jchi4"
     avm_git_repo             = "Adv11"
-    avm_yor_trace            = "02aa64f6-e8b7-474c-aca3-73291d46c725"
+    avm_yor_trace            = "f3caccfa-cbda-4ee8-b4fe-2285532072bb"
     } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/), (/*<box>*/ (var.tracing_tags_enabled ? { for k, v in /*</box>*/ {
     avm_yor_name = "main"
   } /*<box>*/ : replace(k, "avm_", var.tracing_tags_prefix) => v } : {}) /*</box>*/))
