@@ -1,34 +1,34 @@
 name: Post Push
 on:
-  push:
+  pull_request:
     branches:
-      - main
-      - master
-    tags:
-      - '*'
-
-permissions: write-all
+      - 'main'
 
 jobs:
-  post-push:
-    if: github.actor != 'github-actions[bot]'
-    uses: Azure/tfmod-scaffold/.github/workflows/post-push.yaml@main
-  build-and-scan:
-    name: Build and scan image
+  Docker-Image-Scan:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Build the image
-        run: docker build -t test-image .
+      # Login to Docker Registry
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: thegenuinesloth
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Prisma Cloud image scan
+      # Build Docker image
+      - name: Docker Build
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+
+      # Runs Docker image scan
+      - name: Docker Image Scan
         id: scan
-        uses: PaloAltoNetworks/prisma-cloud-scan@v1.1.0
+        uses: PaloAltoNetworks/prisma-cloud-scan@v1
         with:
           pcc_console_url: ${{ secrets.PCC_CONSOLE_URL }}
           pcc_user: ${{ secrets.PCC_USER }}
           pcc_pass: ${{ secrets.PCC_PASS }}
-          image_name: test-image
+          image_name: bitnami/nginx
