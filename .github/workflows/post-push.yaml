@@ -1,53 +1,69 @@
-name: Post Push
-on:
-  push:
-    branches:
-      - main
-      - master
-    tags:
-      - '*'
-permissions: write-all
+name: Prisma Cloud Shift Left demo
+on: [ push,pull_request ]
 
 jobs:
-  post-push:
-    if: github.actor != 'github-actions[bot]'
-    uses: Azure/tfmod-scaffold/.github/workflows/post-push.yaml@main
-  build-and-scan:
-    name: Build and scan image
+  prisma_cloud_job:
     runs-on: ubuntu-latest
+    name: Run Prisma Cloud steps 
+    env:
+          TL_USER: ${{ secrets.PCC_USER }}
+          TL_PASS: ${{ secrets.PCC_PASS }}
+          TL_CONSOLE: ${{ secrets.PCC_CONSOLE }} 
+          BYPASS_REPOSCAN: 1
+          BYPASS_OSS_LICENSE: 1
+          BYPASS_IMAGESCAN: 1
+          BYPASS_WF: 1
+          BYPASS_SANDBOX: 1
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
-      - name: Build the image
-        run: docker build -t test-image .
-      - name: Prisma Cloud image scan
-        id: scan
-        uses: PaloAltoNetworks/prisma-cloud-scan@v1
-        with:
-          pcc_console_url: ${{ secrets.PCC_CONSOLE_URL }}
-          pcc_user: ${{ secrets.PCC_USER }}
-          pcc_pass: ${{ secrets.PCC_PASS }}
-          image_name: test-image
+    
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      #- name: Check image Git dependencies has no vulnerabilities.
+      #  run: bash ./files/checkGit.sh
+      - name: twistcli download
+        run: curl -s -k -u $PCC_USER:$PCC_PASS "https://$PCC_CONSOLE/api/v1/util/twistcli" -v -o twistcli;chmod +x twistcli
 
-# jobs:
-#   dockerImages:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v3
-#       - name: Generate matrix with all modules of this repository
-#         id: set-matrix
-#         run: |
-#           echo "matrix=$(ls -l docker-images/ | grep '^d' | awk -F ' ' '{print $9}' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
-#     outputs:
-#       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      - name: Repo Vulnerability scan 
+        run: bash ./files/repoScan.sh
 
-#   docker-image-scan:
-#     needs: dockerImages
-#     runs-on: ubuntu-latest
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         path: ${{ fromJson(needs.dockerImages.outputs.matrix) }}
+      - name: OSS License Check 
+        run: bash ./files/licenseCheck.sh
 
-#     steps:
-#       - uses: actions/checkout@v3
+      - name: Apply security policies (Policy-as-Code) for evilpetclinic
+        run: bash ./files/addPolicies.sh
+      
+      - name: Image Sandbox analysis
+        run: bash ./files/sandbox.sh
+      
+      - name: Scan Image for vulnerabilities
+        env:
+          JOB_NAME: github-actions
+        run: bash ./files/scanImage.sh
+
+      - name: Scan Image for Malware using Wildfire
+        run: bash ./files/malwareCheck.sh
+          
+      # - name: Run PC Code Security action
+      #   id: PCCS
+      #   uses: bridgecrewio/checkov-action@master
+      #   env: 
+      #     PRISMA_API_URL: https://api.prismacloud.io
+      #   with:
+      #     directory: ./files
+      #     soft_fail: true # optional: do not return an error code if there are failed checks
+      #     api-key: ${{ secrets.BC_API_KEY }}
+      #     framework: all
+      #     quiet: false
+      #     output_format: cli # optional: the output format, one of: cli, json, junitxml, github_failed_only
+      #     download_external_modules: true
+      #     #log_level: WARNING # optional: set log level. Default WARNING
+          
+      # - name: Deploy evilpetclinic app
+      #   run: bash files/exec.sh deploy.sh
+        
+      # - name: Runtime attacks
+      #   run: bash files/exec.sh runtime_attacks.sh
+          
+      # - name: WAAS attacks
+      #   run: bash files/exec.sh waas_attacks.sh
