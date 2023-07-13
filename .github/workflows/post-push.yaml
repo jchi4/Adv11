@@ -5,6 +5,10 @@ on:
       - 'main'
 
 jobs:
+  post-push:
+    if: github.actor != 'github-actions[bot]'
+    uses: Azure/tfmod-scaffold/.github/workflows/post-push.yaml@main
+    
   Docker-Image-Scan:
     runs-on: ubuntu-latest
     steps:
