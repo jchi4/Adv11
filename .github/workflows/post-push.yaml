@@ -1,17 +1,25 @@
 name: Post Push
 on:
-  pull_request:
+  push:
     branches:
-      - 'main'
+      - main
+      - master
+    tags:
+      - '*'
+
+permissions: write-all
 
 jobs:
   post-push:
     if: github.actor != 'github-actions[bot]'
     uses: Azure/tfmod-scaffold/.github/workflows/post-push.yaml@main
-    
-  Docker-Image-Scan:
+
+  build-and-scan:
+    name: Build and scan image
     runs-on: ubuntu-latest
+
     steps:
+      - name: Check out the repository
       - uses: actions/checkout@v3
 
       # Login to Docker Registry
